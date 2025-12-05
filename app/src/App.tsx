@@ -330,7 +330,7 @@ function App() {
             <header className="header">
               <div className="brand">
                 <div className="logo-plate">
-                  <img src="/logo-placeholder.jpg" alt="Pomodrone placeholder logo" />
+                  <img src="/logo-placeholder.png" alt="Pomodrone logo" />
                 </div>
                 <div>
                   <p className="eyebrow">Pomodrone</p>
