@@ -108,7 +108,11 @@ function App() {
     }
   }, [mode, settings.focus, settings.longBreak, settings.shortBreak])
 
+  const previousDurationRef = useRef(baseDuration)
+
   useEffect(() => {
+    if (baseDuration === previousDurationRef.current) return
+    previousDurationRef.current = baseDuration
     if (!isRunning) {
       setSecondsLeft(baseDuration)
     }
