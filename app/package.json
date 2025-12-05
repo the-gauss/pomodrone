@@ -49,6 +49,7 @@
     },
     "mac": {
       "category": "public.app-category.productivity",
+      "icon": "icon.icns",
       "target": [
         {
           "target": "dmg",
