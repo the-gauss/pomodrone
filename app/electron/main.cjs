@@ -12,7 +12,8 @@ const createWindow = () => {
     transparent: true,
     backgroundColor: '#00000000',
     hasShadow: false,
-    // vibrancy removed - gives clear transparency instead of frosted glass
+    vibrancy: 'hud', // Heads-up display - dark with strong blur
+    visualEffectState: 'active',
     titleBarStyle: 'hiddenInset',
     roundedCorners: true,
     show: false,
