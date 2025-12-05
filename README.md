@@ -16,6 +16,11 @@ React + Electron Pomodoro timer with a three-color minimalist UI and standard ma
 5) Load the built renderer in Electron: `npm start` (uses the latest `dist/`).  
 6) Optional lint: `npm run lint`.
 
+### Package a macOS release
+1) `cd app`  
+2) `npm run release:mac`  
+3) The notarization-free DMG(s) land in `app/release/` (Apple will prompt on first launch since the binary isn't signed).
+
 Notes:
 - The window uses the default macOS frame—no custom title bar.  
 - Tick sounds may require one interaction (press Start) before the browser audio context is allowed to play.  
