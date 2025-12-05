@@ -5,14 +5,25 @@
   --accent-rgb: 255, 107, 107;
   --text: #d6dde7;
   --text-rgb: 214, 221, 231;
-  font-family: 'Space Grotesk', 'SF Pro Display', 'Helvetica Neue', sans-serif;
+
+  /* Translucency variables */
+  --alpha: 0.85;
+  /* opacity: 0-1. Increased default for better visibility */
+  --beta: 12px;
+  /* blur strength for internal elements */
+
+  font-family: 'Ubuntu', 'SF Pro Display', 'Helvetica Neue', sans-serif;
   line-height: 1.6;
   font-weight: 500;
   color: var(--text);
-  background-color: var(--bg);
+  background-color: transparent;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  background: transparent;
 }
 
 * {
@@ -23,7 +34,10 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: var(--bg);
+  /* Apply the tint color with adjustable opacity. 
+     Native vibrancy handles the desktop blur. 
+     We optionally add backdrop-filter to blur content BEHIND the body if vibrancy fails or for extra effect. */
+  background: rgba(var(--bg-rgb), var(--alpha));
   color: var(--text);
 }
 

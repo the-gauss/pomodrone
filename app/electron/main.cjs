@@ -9,7 +9,11 @@ const createWindow = () => {
     height: 780,
     minWidth: 360,
     minHeight: 650,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#00000000',
+    transparent: true,
+    vibrancy: 'under-window', // Creates the frosted glass effect
+    visualEffectState: 'active',
+    titleBarStyle: 'hiddenInset', // Helper for 'Mac-like' look: integrated traffic lights
     show: false,
     autoHideMenuBar: true,
     webPreferences: {

@@ -1,10 +1,21 @@
 .app-shell {
   min-height: 100vh;
-  background: var(--bg);
+  background: transparent;
   color: var(--text);
   display: flex;
-  justify-content: center;
-  padding: 32px 20px 48px;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 20px 48px;
+  -webkit-app-region: drag;
+  /* Make the whole window background draggable */
+}
+
+.title-bar {
+  width: 100%;
+  height: 52px;
+  background: var(--bg);
+  -webkit-app-region: drag;
+  flex-shrink: 0;
 }
 
 .frame {
@@ -12,12 +23,22 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  padding-top: 32px;
+  -webkit-app-region: no-drag;
+  /* Disable drag for the content area so buttons work */
 }
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  -webkit-app-region: drag;
+  /* Re-enable drag for the header specifically */
+}
+
+.header * {
+  -webkit-app-region: no-drag;
+  /* Ensure buttons in header are clicking */
 }
 
 .brand {
@@ -266,11 +287,9 @@ input[type='range'] {
   appearance: none;
   height: 8px;
   border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    var(--accent) var(--range-fill, 50%),
-    rgba(var(--text-rgb), 0.18) var(--range-fill, 50%)
-  );
+  background: linear-gradient(90deg,
+      var(--accent) var(--range-fill, 50%),
+      rgba(var(--text-rgb), 0.18) var(--range-fill, 50%));
   outline: none;
   transition: background 0.2s ease;
 }
@@ -303,11 +322,9 @@ input[type='range']::-moz-range-thumb {
 
 input[type='range']::-moz-range-track {
   height: 8px;
-  background: linear-gradient(
-    90deg,
-    var(--accent) var(--range-fill, 50%),
-    rgba(var(--text-rgb), 0.18) var(--range-fill, 50%)
-  );
+  background: linear-gradient(90deg,
+      var(--accent) var(--range-fill, 50%),
+      rgba(var(--text-rgb), 0.18) var(--range-fill, 50%));
   border-radius: 999px;
 }
 
