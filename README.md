@@ -21,6 +21,11 @@ React + Electron Pomodoro timer with a three-color minimalist UI and standard ma
 2) `npm run release:mac`  
 3) The notarization-free DMG(s) land in `app/release/` (Apple will prompt on first launch since the binary isn't signed).
 
+### Package a Windows release
+1) `cd app`  
+2) `npm run release:win`  
+3) Setup EXEs for both x64 and ARM64 will be written to `app/release/`. The script can run on macOS (electron-builder downloads Wine/NSIS automatically) but will be faster on Windows.
+
 Notes:
 - The window uses the default macOS frame—no custom title bar.  
 - Tick sounds may require one interaction (press Start) before the browser audio context is allowed to play.  
