@@ -1,4 +1,4 @@
-import { type CSSProperties, useEffect, useMemo, useRef, useState } from 'react'
+import { type CSSProperties, type JSX, useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 
 type Mode = 'focus' | 'shortBreak' | 'longBreak'
@@ -31,6 +31,59 @@ const TAB_CONFIG: ReadonlyArray<{ key: TabKey; label: string }> = [
   { key: 'stats', label: 'Insights' },
   { key: 'profile', label: 'More' },
 ]
+
+const TAB_ICONS: Record<TabKey, () => JSX.Element> = {
+  timer: () => (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <rect x="9" y="2.25" width="6" height="2.5" rx="1" fill="currentColor" />
+      <circle cx="12" cy="13" r="7" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <path
+        d="M12 13V8.8"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="12" cy="13" r="1.6" fill="currentColor" />
+    </svg>
+  ),
+  session: () => (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <rect x="4" y="6" width="16" height="2" rx="1" fill="currentColor" opacity="0.85" />
+      <rect x="4" y="11" width="16" height="2" rx="1" fill="currentColor" />
+      <rect x="4" y="16" width="16" height="2" rx="1" fill="currentColor" opacity="0.85" />
+      <circle cx="16" cy="7" r="1.5" fill="var(--bg)" />
+      <circle cx="9" cy="12" r="1.5" fill="var(--bg)" />
+      <circle cx="13" cy="17" r="1.5" fill="var(--bg)" />
+    </svg>
+  ),
+  stats: () => (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <rect x="5" y="13" width="3" height="6" rx="1" fill="currentColor" opacity="0.8" />
+      <rect x="10.5" y="9" width="3" height="10" rx="1" fill="currentColor" />
+      <rect x="16" y="5" width="3" height="14" rx="1" fill="currentColor" opacity="0.9" />
+      <path
+        d="M4 20h16"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        opacity="0.65"
+      />
+    </svg>
+  ),
+  profile: () => (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <circle cx="12" cy="9" r="4" fill="currentColor" />
+      <path
+        d="M6 20c0-2.7614 2.6863-5 6-5s6 2.2386 6 5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  ),
+}
 
 const formatTime = (totalSeconds: number) => {
   const minutes = Math.floor(totalSeconds / 60)
@@ -403,16 +456,23 @@ function App() {
         )}
       </div>
       <nav className="tab-bar">
-        {TAB_CONFIG.map((tab) => (
-          <button
-            key={tab.key}
-            type="button"
-            className={`tab-button ${activeTab === tab.key ? 'active' : ''}`}
-            onClick={() => setActiveTab(tab.key)}
-          >
-            {tab.label}
-          </button>
-        ))}
+        {TAB_CONFIG.map((tab) => {
+          const Icon = TAB_ICONS[tab.key]
+          const isActive = activeTab === tab.key
+          return (
+            <button
+              key={tab.key}
+              type="button"
+              className={`tab-button ${isActive ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab.key)}
+            >
+              <span className="tab-icon" aria-hidden="true">
+                <Icon />
+              </span>
+              <span className="sr-only">{tab.label}</span>
+            </button>
+          )
+        })}
       </nav>
     </main>
   )

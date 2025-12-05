@@ -18,13 +18,13 @@
 }
 
 .frame {
-  width: min(520px, 100%);
+  width: min(420px, 100%);
   flex: 1;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding: 32px 20px 32px;
+  gap: 18px;
+  padding: 24px 16px 28px;
   background: transparent;
   -webkit-app-region: no-drag;
 }
@@ -44,14 +44,14 @@
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   background: transparent;
 }
 
 .logo-plate {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
   border: 1px solid rgba(var(--text-rgb), 0.12);
   background: transparent;
   overflow: hidden;
@@ -67,8 +67,8 @@
 
 .eyebrow {
   margin: 0;
-  font-size: 12px;
-  letter-spacing: 0.14em;
+  font-size: 11px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgba(var(--text-rgb), 0.64);
   background: transparent;
@@ -83,12 +83,12 @@
   align-items: baseline;
   gap: 4px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   background: transparent;
 }
 
 .cycle-current {
-  font-size: 24px;
+  font-size: 20px;
   background: transparent;
 }
 
@@ -101,17 +101,17 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   background: transparent;
 }
 
 .timer-ring {
-  width: min(380px, 92vw);
+  width: min(320px, 85vw);
   aspect-ratio: 1;
   border-radius: 999px;
-  padding: 22px;
+  padding: 16px;
   background: transparent;
-  border: 3px solid rgba(var(--accent-rgb), 0.3);
+  border: 2px solid rgba(var(--accent-rgb), 0.3);
   box-shadow: none;
   transition: background 0.4s ease;
 }
@@ -124,22 +124,22 @@
   background: transparent;
   display: grid;
   place-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 .mode-label {
   margin: 0;
-  font-size: 14px;
+  font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.14em;
   color: rgba(var(--text-rgb), 0.7);
   background: transparent;
 }
 
 .time-reading {
   margin: 0;
-  font-size: clamp(52px, 14vw, 76px);
-  letter-spacing: 0.08em;
+  font-size: clamp(44px, 12vw, 64px);
+  letter-spacing: 0.06em;
   font-weight: 700;
   color: var(--text);
   background: transparent;
@@ -147,7 +147,7 @@
 
 .state {
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
   color: rgba(var(--text-rgb), 0.65);
   background: transparent;
 }
@@ -157,19 +157,19 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   background: transparent;
 }
 
 .primary {
-  width: min(260px, 100%);
+  width: min(220px, 100%);
   background: var(--accent);
   color: var(--bg);
   border: none;
   border-radius: 999px;
-  padding: 14px 18px;
+  padding: 12px 16px;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   cursor: pointer;
   box-shadow: none;
   transition: transform 0.18s ease, box-shadow 0.18s ease;
@@ -197,8 +197,8 @@
   background: transparent;
   color: var(--text);
   border: 1px solid rgba(var(--text-rgb), 0.16);
-  border-radius: 12px;
-  padding: 10px 12px;
+  border-radius: 10px;
+  padding: 8px 10px;
   cursor: pointer;
   transition: border-color 0.2s ease, transform 0.15s ease;
 }
@@ -215,11 +215,11 @@
 .settings-panel {
   background: transparent;
   border: 1px solid rgba(var(--text-rgb), 0.12);
-  border-radius: 18px;
-  padding: 16px;
+  border-radius: 16px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .panel-head {
@@ -232,8 +232,8 @@
 
 .panel-title {
   margin: 0;
-  font-size: 16px;
-  letter-spacing: 0.04em;
+  font-size: 15px;
+  letter-spacing: 0.03em;
   font-weight: 700;
   background: transparent;
 }
@@ -241,7 +241,7 @@
 .panel-subtitle {
   margin: 2px 0 0;
   color: rgba(var(--text-rgb), 0.6);
-  font-size: 13px;
+  font-size: 12px;
   background: transparent;
 }
 
@@ -268,14 +268,14 @@
 .settings-stack {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   background: transparent;
 }
 
 .setting-row {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   background: transparent;
 }
 
@@ -288,22 +288,22 @@
 
 .setting-label {
   color: rgba(var(--text-rgb), 0.72);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  font-size: 12px;
+  font-size: 11px;
   background: transparent;
 }
 
 .setting-value {
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   background: transparent;
 }
 
 input[type='range'] {
   width: 100%;
   appearance: none;
-  height: 8px;
+  height: 6px;
   border-radius: 999px;
   background: linear-gradient(90deg,
       var(--accent) var(--range-fill, 50%),
@@ -319,8 +319,8 @@ input[type='range']:disabled {
 
 input[type='range']::-webkit-slider-thumb {
   appearance: none;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background: var(--accent);
   border: 2px solid transparent;
@@ -329,8 +329,8 @@ input[type='range']::-webkit-slider-thumb {
 }
 
 input[type='range']::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background: var(--accent);
   border: 2px solid transparent;
@@ -339,7 +339,7 @@ input[type='range']::-moz-range-thumb {
 }
 
 input[type='range']::-moz-range-track {
-  height: 8px;
+  height: 6px;
   background: linear-gradient(90deg,
       var(--accent) var(--range-fill, 50%),
       rgba(var(--text-rgb), 0.18) var(--range-fill, 50%));
@@ -356,12 +356,12 @@ input[type='range']::-moz-range-track {
 .toggle {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   background: transparent;
   color: var(--text);
   border: 1px solid rgba(var(--text-rgb), 0.18);
   border-radius: 12px;
-  padding: 10px 12px;
+  padding: 8px 10px;
   cursor: pointer;
   transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
 }
@@ -395,71 +395,95 @@ input[type='range']::-moz-range-track {
 
 .placeholder-panel {
   border: 1px solid rgba(var(--text-rgb), 0.12);
-  border-radius: 18px;
-  padding: 32px 16px;
+  border-radius: 14px;
+  padding: 22px 12px;
   text-align: center;
   background: transparent;
 }
 
 .tab-bar {
-  width: min(520px, 100%);
+  width: min(420px, 100%);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  padding: 12px 20px 24px;
+  gap: 6px;
+  padding: 10px 14px 18px;
   border-top: 1px solid rgba(var(--text-rgb), 0.12);
   background: transparent;
   -webkit-app-region: no-drag;
 }
 
 .tab-button {
-  border: 1px solid rgba(var(--text-rgb), 0.16);
-  border-radius: 999px;
-  padding: 10px 8px;
+  border: none;
   background: transparent;
-  color: rgba(var(--text-rgb), 0.7);
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
-  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
 }
 
-.tab-button.active {
+.tab-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 18px;
+  background: rgba(var(--text-rgb), 0.12);
+  display: grid;
+  place-items: center;
+  color: rgba(var(--text-rgb), 0.75);
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+
+.tab-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.tab-button.active .tab-icon {
+  background: rgba(var(--accent-rgb), 0.18);
   color: var(--accent);
-  border-color: rgba(var(--accent-rgb), 0.6);
-  background: rgba(var(--accent-rgb), 0.12);
 }
 
-.tab-button:active {
+.tab-button:active .tab-icon {
   transform: translateY(0.5px);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }
 
 @media (max-width: 520px) {
   .frame {
-    gap: 18px;
+    gap: 16px;
   }
 
   .timer-ring {
-    padding: 18px;
+    padding: 14px;
   }
 
   .secondary {
-    padding: 10px;
+    padding: 9px;
   }
 
   .tab-bar {
-    padding: 12px 16px 20px;
-    gap: 6px;
+    padding: 10px 12px 16px;
+    gap: 4px;
   }
 
-  .tab-button {
-    font-size: 11px;
-    letter-spacing: 0.06em;
+  .tab-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 16px;
   }
 
-  .panel-head {
-    flex-direction: column;
-    align-items: flex-start;
+  .tab-icon svg {
+    width: 20px;
+    height: 20px;
   }
 }
