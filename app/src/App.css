@@ -6,6 +6,7 @@
   flex-direction: column;
   align-items: center;
   padding: 0;
+  width: 100%;
 }
 
 .title-bar {
@@ -18,10 +19,12 @@
 
 .frame {
   width: min(520px, 100%);
+  flex: 1;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 24px;
-  padding: 32px 20px 48px;
+  padding: 32px 20px 32px;
   background: transparent;
   -webkit-app-region: no-drag;
 }
@@ -386,6 +389,52 @@ input[type='range']::-moz-range-track {
   transform: translateY(0.5px);
 }
 
+.tab-panel {
+  width: 100%;
+}
+
+.placeholder-panel {
+  border: 1px solid rgba(var(--text-rgb), 0.12);
+  border-radius: 18px;
+  padding: 32px 16px;
+  text-align: center;
+  background: transparent;
+}
+
+.tab-bar {
+  width: min(520px, 100%);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 12px 20px 24px;
+  border-top: 1px solid rgba(var(--text-rgb), 0.12);
+  background: transparent;
+  -webkit-app-region: no-drag;
+}
+
+.tab-button {
+  border: 1px solid rgba(var(--text-rgb), 0.16);
+  border-radius: 999px;
+  padding: 10px 8px;
+  background: transparent;
+  color: rgba(var(--text-rgb), 0.7);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.tab-button.active {
+  color: var(--accent);
+  border-color: rgba(var(--accent-rgb), 0.6);
+  background: rgba(var(--accent-rgb), 0.12);
+}
+
+.tab-button:active {
+  transform: translateY(0.5px);
+}
+
 @media (max-width: 520px) {
   .frame {
     gap: 18px;
@@ -397,6 +446,16 @@ input[type='range']::-moz-range-track {
 
   .secondary {
     padding: 10px;
+  }
+
+  .tab-bar {
+    padding: 12px 16px 20px;
+    gap: 6px;
+  }
+
+  .tab-button {
+    font-size: 11px;
+    letter-spacing: 0.06em;
   }
 
   .panel-head {
