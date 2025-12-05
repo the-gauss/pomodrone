@@ -5,9 +5,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 20px 48px;
-  -webkit-app-region: drag;
-  /* Make the whole window background draggable */
+  padding: 0;
 }
 
 .title-bar {
@@ -23,28 +21,28 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  padding-top: 32px;
+  padding: 32px 20px 48px;
+  background: transparent;
   -webkit-app-region: no-drag;
-  /* Disable drag for the content area so buttons work */
 }
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background: transparent;
   -webkit-app-region: drag;
-  /* Re-enable drag for the header specifically */
 }
 
 .header * {
   -webkit-app-region: no-drag;
-  /* Ensure buttons in header are clicking */
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 12px;
+  background: transparent;
 }
 
 .logo-plate {
@@ -52,7 +50,7 @@
   height: 56px;
   border-radius: 16px;
   border: 1px solid rgba(var(--text-rgb), 0.12);
-  background: rgba(var(--text-rgb), 0.06);
+  background: transparent;
   overflow: hidden;
   display: grid;
   place-items: center;
@@ -70,6 +68,7 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: rgba(var(--text-rgb), 0.64);
+  background: transparent;
 }
 
 .eyebrow.muted {
@@ -82,14 +81,17 @@
   gap: 4px;
   font-weight: 700;
   letter-spacing: 0.08em;
+  background: transparent;
 }
 
 .cycle-current {
   font-size: 24px;
+  background: transparent;
 }
 
 .cycle-total {
   color: rgba(var(--text-rgb), 0.6);
+  background: transparent;
 }
 
 .timer-section {
@@ -97,6 +99,7 @@
   flex-direction: column;
   align-items: center;
   gap: 14px;
+  background: transparent;
 }
 
 .timer-ring {
@@ -104,9 +107,9 @@
   aspect-ratio: 1;
   border-radius: 999px;
   padding: 22px;
-  background: radial-gradient(var(--bg) 58%, transparent 60%),
-    conic-gradient(var(--accent) var(--progress-deg, 0deg), rgba(var(--accent-rgb), 0.18) var(--progress-deg, 0deg));
-  box-shadow: 0 20px 60px rgba(var(--bg-rgb), 0.55);
+  background: transparent;
+  border: 3px solid rgba(var(--accent-rgb), 0.3);
+  box-shadow: none;
   transition: background 0.4s ease;
 }
 
@@ -115,7 +118,7 @@
   height: 100%;
   border-radius: 999px;
   border: 2px solid rgba(var(--text-rgb), 0.08);
-  background: radial-gradient(circle at 40% 30%, rgba(var(--text-rgb), 0.08), rgba(var(--text-rgb), 0.02));
+  background: transparent;
   display: grid;
   place-items: center;
   gap: 6px;
@@ -127,6 +130,7 @@
   text-transform: uppercase;
   letter-spacing: 0.18em;
   color: rgba(var(--text-rgb), 0.7);
+  background: transparent;
 }
 
 .time-reading {
@@ -135,12 +139,14 @@
   letter-spacing: 0.08em;
   font-weight: 700;
   color: var(--text);
+  background: transparent;
 }
 
 .state {
   margin: 0;
   font-size: 14px;
   color: rgba(var(--text-rgb), 0.65);
+  background: transparent;
 }
 
 .controls {
@@ -149,6 +155,7 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
+  background: transparent;
 }
 
 .primary {
@@ -161,13 +168,13 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   cursor: pointer;
-  box-shadow: 0 14px 38px rgba(var(--accent-rgb), 0.32);
+  box-shadow: none;
   transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
 .primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 20px 40px rgba(var(--accent-rgb), 0.38);
+  box-shadow: 0 10px 20px rgba(var(--accent-rgb), 0.2);
 }
 
 .primary:active {
@@ -179,11 +186,12 @@
   gap: 10px;
   justify-content: center;
   width: 100%;
+  background: transparent;
 }
 
 .secondary {
   flex: 1;
-  background: rgba(var(--text-rgb), 0.1);
+  background: transparent;
   color: var(--text);
   border: 1px solid rgba(var(--text-rgb), 0.16);
   border-radius: 12px;
@@ -202,14 +210,13 @@
 }
 
 .settings-panel {
-  background: rgba(var(--text-rgb), 0.05);
+  background: transparent;
   border: 1px solid rgba(var(--text-rgb), 0.12);
   border-radius: 18px;
   padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  backdrop-filter: blur(4px);
 }
 
 .panel-head {
@@ -217,6 +224,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 12px;
+  background: transparent;
 }
 
 .panel-title {
@@ -224,16 +232,18 @@
   font-size: 16px;
   letter-spacing: 0.04em;
   font-weight: 700;
+  background: transparent;
 }
 
 .panel-subtitle {
   margin: 2px 0 0;
   color: rgba(var(--text-rgb), 0.6);
   font-size: 13px;
+  background: transparent;
 }
 
 .text-link {
-  background: none;
+  background: transparent;
   border: none;
   color: var(--accent);
   cursor: pointer;
@@ -256,18 +266,21 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  background: transparent;
 }
 
 .setting-row {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  background: transparent;
 }
 
 .setting-header {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  background: transparent;
 }
 
 .setting-label {
@@ -275,11 +288,13 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-size: 12px;
+  background: transparent;
 }
 
 .setting-value {
   font-weight: 700;
   letter-spacing: 0.04em;
+  background: transparent;
 }
 
 input[type='range'] {
@@ -305,8 +320,8 @@ input[type='range']::-webkit-slider-thumb {
   height: 18px;
   border-radius: 50%;
   background: var(--accent);
-  border: 2px solid var(--bg);
-  box-shadow: 0 6px 18px rgba(var(--accent-rgb), 0.35);
+  border: 2px solid transparent;
+  box-shadow: none;
   cursor: pointer;
 }
 
@@ -315,8 +330,8 @@ input[type='range']::-moz-range-thumb {
   height: 18px;
   border-radius: 50%;
   background: var(--accent);
-  border: 2px solid var(--bg);
-  box-shadow: 0 6px 18px rgba(var(--accent-rgb), 0.35);
+  border: 2px solid transparent;
+  box-shadow: none;
   cursor: pointer;
 }
 
@@ -332,13 +347,14 @@ input[type='range']::-moz-range-track {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  background: transparent;
 }
 
 .toggle {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  background: rgba(var(--text-rgb), 0.08);
+  background: transparent;
   color: var(--text);
   border: 1px solid rgba(var(--text-rgb), 0.18);
   border-radius: 12px;
@@ -352,18 +368,18 @@ input[type='range']::-moz-range-track {
   height: 12px;
   border-radius: 50%;
   background: rgba(var(--text-rgb), 0.5);
-  box-shadow: 0 0 0 4px rgba(var(--text-rgb), 0.14);
+  box-shadow: none;
 }
 
 .toggle.active {
-  background: rgba(var(--accent-rgb), 0.16);
+  background: transparent;
   border-color: rgba(var(--accent-rgb), 0.5);
   color: var(--accent);
 }
 
 .toggle.active .toggle-dot {
   background: var(--accent);
-  box-shadow: 0 0 0 6px rgba(var(--accent-rgb), 0.25);
+  box-shadow: none;
 }
 
 .toggle:active {

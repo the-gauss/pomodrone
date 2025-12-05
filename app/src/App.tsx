@@ -256,6 +256,7 @@ function App() {
 
   return (
     <main className="app-shell">
+      <div className="title-bar" />
       <div className="frame">
         <header className="header">
           <div className="brand">

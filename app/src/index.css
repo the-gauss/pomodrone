@@ -7,9 +7,9 @@
   --text-rgb: 214, 221, 231;
 
   /* Translucency variables */
-  --alpha: 0.85;
+  --alpha: 0.4;
   /* opacity: 0-1. Increased default for better visibility */
-  --beta: 12px;
+  --beta: 30px;
   /* blur strength for internal elements */
 
   font-family: 'Ubuntu', 'SF Pro Display', 'Helvetica Neue', sans-serif;
@@ -34,10 +34,10 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  /* Apply the tint color with adjustable opacity. 
-     Native vibrancy handles the desktop blur. 
-     We optionally add backdrop-filter to blur content BEHIND the body if vibrancy fails or for extra effect. */
+  /* Apply tint color (alpha) AND custom blur (beta) to the whole window background */
   background: rgba(var(--bg-rgb), var(--alpha));
+  backdrop-filter: blur(var(--beta));
+  -webkit-backdrop-filter: blur(var(--beta));
   color: var(--text);
 }
 
