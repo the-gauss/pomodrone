@@ -448,11 +448,18 @@ function App() {
 
             <div className="toggles">
               <button
-                className={`toggle ${tickEnabled ? 'active' : ''}`}
+                className={`toggle-switch ${tickEnabled ? 'active' : ''}`}
                 onClick={() => setTickEnabled((prev) => !prev)}
+                role="switch"
+                aria-checked={tickEnabled}
+                type="button"
               >
-                <span className="toggle-dot" aria-hidden />
-                <span>{tickEnabled ? 'Tick sound on' : 'Tick sound muted'}</span>
+                <span className="switch-visual" aria-hidden>
+                  <span className="switch-thumb" />
+                </span>
+                <span className="switch-label">
+                  {tickEnabled ? 'Tick sound on' : 'Tick sound muted'}
+                </span>
               </button>
             </div>
           </section>
