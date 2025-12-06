@@ -1,4 +1,5 @@
 ## Pomodrone
+<img width="353" height="572" alt="image" src="https://github.com/user-attachments/assets/9e2195f7-af60-467a-9747-85dc3b5cf0c7" />
 
 React + Electron Pomodoro timer with a three-color minimalist UI and standard macOS chrome.
 
