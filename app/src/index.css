@@ -11,6 +11,8 @@
   /* opacity: 0-1. Increased default for better visibility */
   --beta: 5px;
   /* blur strength for internal elements */
+  --ui-scale: 0.55;
+  /* density target for compact UI */
 
   font-family: 'Ubuntu', 'SF Pro Display', 'Helvetica Neue', sans-serif;
   line-height: 1.6;
@@ -32,7 +34,7 @@ html {
 
 body {
   margin: 0;
-  min-width: 320px;
+  min-width: calc(var(--ui-scale) * 320px);
   min-height: 100vh;
   /* Apply tint color (alpha) AND custom blur (beta) to the whole window background */
   background: rgba(var(--bg-rgb), var(--alpha));

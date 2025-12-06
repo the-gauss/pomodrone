@@ -160,6 +160,23 @@ function App() {
 
   const audioCtxRef = useRef<AudioContext | null>(null)
 
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return
+    const minScale = 0.55
+    const maxScale = 1
+    const referenceWidth = 420
+    const root = document.documentElement
+    const updateScale = () => {
+      const width = window.innerWidth || referenceWidth
+      const proportional = width / referenceWidth
+      const next = Math.min(maxScale, Math.max(minScale, proportional))
+      root.style.setProperty('--ui-scale', next.toString())
+    }
+    updateScale()
+    window.addEventListener('resize', updateScale)
+    return () => window.removeEventListener('resize', updateScale)
+  }, [])
+
   const baseDuration = useMemo(() => {
     switch (mode) {
       case 'shortBreak':
