@@ -5,10 +5,10 @@ const devUrl = process.env.VITE_DEV_SERVER_URL;
 
 const createWindow = () => {
   const win = new BrowserWindow({
-    width: 420,
-    height: 780,
-    minWidth: 360,
-    minHeight: 650,
+    width: 260,
+    height: 520,
+    minWidth: 220,
+    minHeight: 360,
     transparent: true,
     backgroundColor: '#00000000',
     hasShadow: false,
