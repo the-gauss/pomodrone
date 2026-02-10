@@ -1,7 +1,9 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('node:path');
+const { AnalyticsStore } = require('./analytics-store.cjs');
 
 const devUrl = process.env.VITE_DEV_SERVER_URL;
+let analyticsStore = null;
 
 const createWindow = () => {
   const win = new BrowserWindow({
@@ -21,6 +23,7 @@ const createWindow = () => {
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
+      preload: path.join(__dirname, 'preload.cjs'),
     },
   });
 
@@ -34,7 +37,25 @@ const createWindow = () => {
   }
 };
 
+const registerAnalyticsHandlers = () => {
+  ipcMain.handle('analytics:record-session', async (_event, payload) => {
+    if (!analyticsStore) {
+      throw new Error('Analytics backend is not initialized');
+    }
+    return analyticsStore.appendSession(payload);
+  });
+
+  ipcMain.handle('analytics:get-summary', async () => {
+    if (!analyticsStore) {
+      throw new Error('Analytics backend is not initialized');
+    }
+    return analyticsStore.getSummary();
+  });
+};
+
 app.whenReady().then(() => {
+  analyticsStore = new AnalyticsStore(app.getPath('userData'));
+  registerAnalyticsHandlers();
   createWindow();
 
   app.on('activate', () => {

@@ -9,8 +9,11 @@
     "dev:renderer": "vite",
     "dev:electron": "wait-on http://localhost:5173 && env -u ELECTRON_RUN_AS_NODE VITE_DEV_SERVER_URL=http://localhost:5173 electron .",
     "start": "npm run build && env -u ELECTRON_RUN_AS_NODE electron .",
+    "start:detached": "npm run build && node scripts/open-mac-app.cjs --from-dist",
     "build": "tsc -b && vite build",
-    "release:mac": "npm run build && electron-builder --mac dmg",
+    "release:mac": "npm run build && electron-builder --mac zip dir",
+    "release:mac:launch": "npm run release:mac && npm run launch:mac",
+    "launch:mac": "node scripts/open-mac-app.cjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },

@@ -300,6 +300,51 @@
   background: transparent;
 }
 
+.setting-value-group {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--ui-scale) * 8px);
+  background: transparent;
+}
+
+.minute-input-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--ui-scale) * 6px);
+  padding: calc(var(--ui-scale) * 4px) calc(var(--ui-scale) * 8px);
+  border: calc(var(--ui-scale) * 1px) solid rgba(var(--text-rgb), 0.16);
+  border-radius: calc(var(--ui-scale) * 9px);
+  background: rgba(var(--text-rgb), 0.04);
+}
+
+.minute-input-prefix {
+  font-size: calc(var(--ui-scale) * 10px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(var(--text-rgb), 0.6);
+}
+
+.minute-input {
+  width: calc(var(--ui-scale) * 48px);
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-weight: 700;
+  text-align: right;
+  font-size: calc(var(--ui-scale) * 12px);
+  padding: 0;
+  outline: none;
+}
+
+.minute-input:disabled {
+  opacity: 0.65;
+}
+
+.minute-input::-webkit-outer-spin-button,
+.minute-input::-webkit-inner-spin-button {
+  margin: 0;
+}
+
 input[type='range'] {
   --range-rail: rgba(var(--text-rgb), 0.18);
   --range-fill-color: rgba(var(--text-rgb), 0.6);
@@ -448,6 +493,121 @@ input[type='range']::-moz-range-progress {
 
 .tab-panel {
   width: 100%;
+}
+
+.analytics-panel {
+  gap: calc(var(--ui-scale) * 14px);
+}
+
+.analytics-state {
+  margin-top: calc(var(--ui-scale) * 6px);
+}
+
+.analytics-error {
+  margin: 0;
+  border: calc(var(--ui-scale) * 1px) solid rgba(255, 138, 138, 0.35);
+  background: rgba(255, 138, 138, 0.08);
+  color: #ffc5c5;
+  border-radius: calc(var(--ui-scale) * 10px);
+  padding: calc(var(--ui-scale) * 9px) calc(var(--ui-scale) * 10px);
+  font-size: calc(var(--ui-scale) * 12px);
+}
+
+.finish-drive {
+  border: calc(var(--ui-scale) * 1px) solid rgba(var(--accent-rgb), 0.35);
+  border-radius: calc(var(--ui-scale) * 14px);
+  padding: calc(var(--ui-scale) * 12px);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--accent-rgb), 0.18) 0%,
+    rgba(var(--accent-rgb), 0.04) 68%
+  );
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--ui-scale) * 8px);
+}
+
+.finish-drive-label {
+  margin: 0;
+  font-size: calc(var(--ui-scale) * 10px);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(var(--text-rgb), 0.7);
+}
+
+.finish-drive-score {
+  margin: calc(var(--ui-scale) * 2px) 0 0;
+  font-size: calc(var(--ui-scale) * 36px);
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--accent);
+}
+
+.finish-drive-meter {
+  width: 100%;
+  height: calc(var(--ui-scale) * 9px);
+  border-radius: calc(var(--ui-scale) * 999px);
+  background: rgba(var(--text-rgb), 0.2);
+  overflow: hidden;
+}
+
+.finish-drive-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(var(--accent-rgb), 0.6), rgba(var(--accent-rgb), 1));
+  border-radius: inherit;
+  transition: width 0.25s ease;
+}
+
+.finish-drive-text {
+  margin: 0;
+  font-size: calc(var(--ui-scale) * 12px);
+  color: rgba(var(--text-rgb), 0.82);
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: calc(var(--ui-scale) * 10px);
+}
+
+.analytics-card {
+  border: calc(var(--ui-scale) * 1px) solid rgba(var(--text-rgb), 0.14);
+  background: rgba(var(--text-rgb), 0.04);
+  border-radius: calc(var(--ui-scale) * 12px);
+  padding: calc(var(--ui-scale) * 10px) calc(var(--ui-scale) * 11px);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--ui-scale) * 4px);
+}
+
+.analytics-card-label {
+  margin: 0;
+  font-size: calc(var(--ui-scale) * 11px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(var(--text-rgb), 0.64);
+}
+
+.analytics-card-value {
+  margin: 0;
+  font-size: calc(var(--ui-scale) * 24px);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text);
+}
+
+.analytics-card-meta {
+  margin: 0;
+  font-size: calc(var(--ui-scale) * 12px);
+  color: rgba(var(--text-rgb), 0.72);
+}
+
+.analytics-footnote {
+  margin: 0;
+  font-size: calc(var(--ui-scale) * 12px);
+  color: rgba(var(--text-rgb), 0.68);
 }
 
 .placeholder-panel {

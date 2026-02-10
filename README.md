@@ -20,7 +20,8 @@ React + Electron Pomodoro timer with a three-color minimalist UI and standard ma
 ### Package a macOS release
 1) `cd app`  
 2) `npm run release:mac`  
-3) The notarization-free DMG(s) land in `app/release/` (Apple will prompt on first launch since the binary isn't signed).
+3) The notarization-free artifacts land in `app/release/` as a macOS zip plus unpacked `.app` bundle.
+4) Launch it cleanly without a terminal-bound process: `npm run launch:mac` (or double-click `app/release/mac-arm64/Pomodrone.app` in Finder).
 
 Notes:
 - The window uses the default macOS frame—no custom title bar.  

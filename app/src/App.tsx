@@ -1,4 +1,18 @@
-import { type CSSProperties, type JSX, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  type CSSProperties,
+  type JSX,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
+import type {
+  AnalyticsSummary,
+  AnalyticsWindowSummary,
+  SessionReason,
+  SessionRecordPayload,
+} from './analytics-api'
 import './App.css'
 
 type Mode = 'focus' | 'shortBreak' | 'longBreak'
@@ -8,6 +22,17 @@ type Settings = {
   shortBreak: number
   longBreak: number
   cycles: number
+}
+
+type TabKey = 'timer' | 'session' | 'stats' | 'profile'
+type AnalyticsWindowKey = 'sevenDay' | 'thirtyDay' | 'allTime'
+
+type ActiveSessionDraft = {
+  sessionId: string
+  mode: Mode
+  cycleIndex: number
+  plannedSeconds: number
+  startedAt: string
 }
 
 const DEFAULT_SETTINGS: Settings = {
@@ -23,13 +48,17 @@ const LABELS: Record<Mode, string> = {
   longBreak: 'Long Break',
 }
 
-type TabKey = 'timer' | 'session' | 'stats' | 'profile'
-
 const TAB_CONFIG: ReadonlyArray<{ key: TabKey; label: string }> = [
   { key: 'timer', label: 'Timer' },
   { key: 'session', label: 'Session setup' },
   { key: 'stats', label: 'Insights' },
   { key: 'profile', label: 'More' },
+]
+
+const ANALYTICS_WINDOWS: ReadonlyArray<{ key: AnalyticsWindowKey; label: string }> = [
+  { key: 'sevenDay', label: 'Last 7 days' },
+  { key: 'thirtyDay', label: 'Last 30 days' },
+  { key: 'allTime', label: 'All time' },
 ]
 
 const TAB_ICONS: Record<TabKey, () => JSX.Element> = {
@@ -91,6 +120,36 @@ const formatTime = (totalSeconds: number) => {
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 }
 
+const formatPercent = (value: number) => `${Math.round(Math.max(0, value) * 100)}%`
+
+const formatDuration = (seconds: number) => {
+  const totalMinutes = Math.max(0, Math.round(seconds / 60))
+  if (totalMinutes >= 60) {
+    const hours = Math.floor(totalMinutes / 60)
+    const minutes = totalMinutes % 60
+    return minutes === 0 ? `${hours}h` : `${hours}h ${minutes}m`
+  }
+  return `${totalMinutes}m`
+}
+
+const buildPressureMessage = (summary: AnalyticsWindowSummary) => {
+  if (summary.totalSessions === 0) {
+    return 'Finish your first session to start a momentum streak.'
+  }
+
+  if (summary.completionRate < 0.55) {
+    return `You leaked ${formatDuration(summary.unfinishedSeconds)} this window. Closing sessions now recovers your pace.`
+  }
+
+  if (summary.completionRate < 0.8) {
+    return 'You are close to consistency. Finish the next session fully to tighten your finish discipline.'
+  }
+
+  return 'You are in a high-completion rhythm. Keep finishing to protect your momentum streak.'
+}
+
+const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
+
 const loadSettings = (): Settings => {
   if (typeof window === 'undefined') return DEFAULT_SETTINGS
   const raw = localStorage.getItem('pomodrone-settings')
@@ -104,8 +163,24 @@ const loadSettings = (): Settings => {
   }
 }
 
-const clamp = (value: number, min: number, max: number) =>
-  Math.min(Math.max(value, min), max)
+const createSessionId = () => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
+  }
+  return `session_${Date.now()}_${Math.random().toString(16).slice(2, 8)}`
+}
+
+const createSessionDraft = (
+  mode: Mode,
+  cycleIndex: number,
+  plannedSeconds: number,
+): ActiveSessionDraft => ({
+  sessionId: createSessionId(),
+  mode,
+  cycleIndex,
+  plannedSeconds: Math.max(1, Math.round(plannedSeconds)),
+  startedAt: new Date().toISOString(),
+})
 
 const SettingSlider = ({
   label,
@@ -124,19 +199,39 @@ const SettingSlider = ({
   disabled?: boolean
   onChange: (nextMinutes: number) => void
 }) => {
-  const fillPercent = ((minutes - min) / (max - min)) * 100
+  const safeMinutes = Math.max(min, Math.round(minutes))
+  const adaptiveMax = Math.max(max, safeMinutes + Math.max(step * 20, 12))
+  const fillPercent = ((safeMinutes - min) / (adaptiveMax - min || 1)) * 100
+
   return (
     <div className="setting-row">
       <div className="setting-header">
         <span className="setting-label">{label}</span>
-        <span className="setting-value">{formatTime(Math.round(minutes * 60))}</span>
+        <div className="setting-value-group">
+          <span className="setting-value">{formatTime(safeMinutes * 60)}</span>
+          <label className="minute-input-wrap">
+            <span className="minute-input-prefix">min</span>
+            <input
+              type="number"
+              min={min}
+              step={1}
+              disabled={disabled}
+              className="minute-input"
+              value={safeMinutes}
+              onChange={(event) => {
+                const next = Number(event.target.value)
+                onChange(Number.isFinite(next) ? Math.max(min, Math.round(next)) : min)
+              }}
+            />
+          </label>
+        </div>
       </div>
       <input
         type="range"
         min={min}
-        max={max}
+        max={adaptiveMax}
         step={step}
-        value={minutes}
+        value={safeMinutes}
         disabled={disabled}
         style={{ '--range-fill': `${fillPercent}%` } as CSSProperties}
         onChange={(event) => onChange(Number(event.target.value))}
@@ -157,8 +252,24 @@ function App() {
     return stored ? stored === 'true' : true
   })
   const [activeTab, setActiveTab] = useState<TabKey>('timer')
+  const [analyticsSummary, setAnalyticsSummary] = useState<AnalyticsSummary | null>(null)
+  const [analyticsLoading, setAnalyticsLoading] = useState(true)
+  const [analyticsError, setAnalyticsError] = useState<string | null>(null)
 
   const audioCtxRef = useRef<AudioContext | null>(null)
+  const secondsLeftRef = useRef(secondsLeft)
+  const isRunningRef = useRef(isRunning)
+  const activeSessionRef = useRef<ActiveSessionDraft>(
+    createSessionDraft(mode, currentCycle, settings.focus),
+  )
+
+  useEffect(() => {
+    secondsLeftRef.current = secondsLeft
+  }, [secondsLeft])
+
+  useEffect(() => {
+    isRunningRef.current = isRunning
+  }, [isRunning])
 
   useEffect(() => {
     if (typeof window === 'undefined' || typeof document === 'undefined') return
@@ -166,12 +277,14 @@ function App() {
     const maxScale = 1
     const referenceWidth = 420
     const root = document.documentElement
+
     const updateScale = () => {
       const width = window.innerWidth || referenceWidth
       const proportional = width / referenceWidth
       const next = Math.min(maxScale, Math.max(minScale, proportional))
       root.style.setProperty('--ui-scale', next.toString())
     }
+
     updateScale()
     window.addEventListener('resize', updateScale)
     return () => window.removeEventListener('resize', updateScale)
@@ -188,15 +301,106 @@ function App() {
     }
   }, [mode, settings.focus, settings.longBreak, settings.shortBreak])
 
+  const selectedWindow = analyticsSummary?.sevenDay
+
+  const loadAnalyticsSummary = useCallback(async () => {
+    if (!window.analyticsApi) {
+      setAnalyticsLoading(false)
+      setAnalyticsError('Insights backend is unavailable in this runtime.')
+      return
+    }
+
+    try {
+      const response = await window.analyticsApi.getSummary()
+      setAnalyticsSummary(response)
+      setAnalyticsError(null)
+    } catch (error) {
+      console.error('Failed to load analytics summary', error)
+      setAnalyticsError('Unable to load insights right now.')
+    } finally {
+      setAnalyticsLoading(false)
+    }
+  }, [])
+
+  const persistSession = useCallback(
+    async (payload: SessionRecordPayload) => {
+      if (!window.analyticsApi) return
+
+      try {
+        await window.analyticsApi.recordSession(payload)
+        const response = await window.analyticsApi.getSummary()
+        setAnalyticsSummary(response)
+        setAnalyticsError(null)
+      } catch (error) {
+        console.error('Failed to persist session analytics', error)
+        setAnalyticsError('Session tracking failed to persist for one event.')
+      }
+    },
+    [],
+  )
+
+  const restartSessionDraft = useCallback((nextMode: Mode, cycleIndex: number, duration: number) => {
+    activeSessionRef.current = createSessionDraft(nextMode, cycleIndex, duration)
+  }, [])
+
+  const finalizeActiveSession = useCallback(
+    (
+      reason: SessionReason,
+      options?: {
+        forcedActualSeconds?: number
+        markSkipped?: boolean
+      },
+    ) => {
+      const draft = activeSessionRef.current
+      const inferredActual = draft.plannedSeconds - secondsLeftRef.current
+      const actualSeconds = Math.max(
+        0,
+        Math.min(draft.plannedSeconds, Math.round(options?.forcedActualSeconds ?? inferredActual)),
+      )
+
+      if (actualSeconds <= 0 && reason !== 'completed') {
+        return
+      }
+
+      const completionRatio =
+        draft.plannedSeconds > 0 ? Math.min(1, actualSeconds / draft.plannedSeconds) : 0
+      const completed = reason === 'completed' || completionRatio >= 0.999
+
+      const payload: SessionRecordPayload = {
+        sessionId: draft.sessionId,
+        startedAt: draft.startedAt,
+        endedAt: new Date().toISOString(),
+        mode: draft.mode,
+        plannedSeconds: draft.plannedSeconds,
+        actualSeconds,
+        completionRatio,
+        completed,
+        wasSkipped: Boolean(options?.markSkipped),
+        cycleIndex: draft.cycleIndex,
+        reason,
+      }
+
+      // Persist each finalized session immediately so analytics stays up to date.
+      void persistSession(payload)
+    },
+    [persistSession],
+  )
+
+  useEffect(() => {
+    void loadAnalyticsSummary()
+  }, [loadAnalyticsSummary])
+
   const previousDurationRef = useRef(baseDuration)
 
   useEffect(() => {
     if (baseDuration === previousDurationRef.current) return
     previousDurationRef.current = baseDuration
-    if (!isRunning) {
+
+    if (!isRunningRef.current) {
       setSecondsLeft(baseDuration)
+      restartSessionDraft(mode, currentCycle, baseDuration)
     }
-  }, [baseDuration, isRunning])
+  }, [baseDuration, currentCycle, mode, restartSessionDraft])
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -212,22 +416,28 @@ function App() {
 
   const ensureAudio = () => {
     if (!tickEnabled) return null
+
     if (!audioCtxRef.current) {
       audioCtxRef.current = new AudioContext()
     }
+
     if (audioCtxRef.current.state === 'suspended') {
       audioCtxRef.current.resume()
     }
+
     return audioCtxRef.current
   }
 
   const playTick = () => {
     const ctx = ensureAudio()
     if (!ctx) return
+
     const oscillator = ctx.createOscillator()
     const gain = ctx.createGain()
+
     oscillator.frequency.value = 880
     gain.gain.value = 0.02
+
     oscillator.connect(gain).connect(ctx.destination)
     oscillator.start()
     oscillator.stop(ctx.currentTime + 0.05)
@@ -236,13 +446,16 @@ function App() {
   const playEndChime = () => {
     const ctx = ensureAudio()
     if (!ctx) return
+
     const now = ctx.currentTime
     const osc = ctx.createOscillator()
     const gain = ctx.createGain()
+
     osc.type = 'triangle'
     osc.frequency.value = 620
     gain.gain.setValueAtTime(0.05, now)
     gain.gain.exponentialRampToValueAtTime(0.005, now + 0.5)
+
     osc.connect(gain).connect(ctx.destination)
     osc.start(now)
     osc.stop(now + 0.55)
@@ -255,9 +468,11 @@ function App() {
       }
       return { mode: 'shortBreak' as Mode, cycle: currentCycle, duration: settings.shortBreak }
     }
+
     if (mode === 'shortBreak') {
       return { mode: 'focus' as Mode, cycle: currentCycle + 1, duration: settings.focus }
     }
+
     return { mode: 'focus' as Mode, cycle: 1, duration: settings.focus }
   }
 
@@ -268,14 +483,22 @@ function App() {
       setSecondsLeft((prev) => {
         if (prev <= 1) {
           playEndChime()
+
+          finalizeActiveSession('completed', {
+            forcedActualSeconds: activeSessionRef.current.plannedSeconds,
+          })
+
           const updated = nextStage()
           setMode(updated.mode)
           setCurrentCycle(updated.cycle)
+          restartSessionDraft(updated.mode, updated.cycle, updated.duration)
           return updated.duration
         }
+
         if (tickEnabled) {
           playTick()
         }
+
         return prev - 1
       })
     }, 1000)
@@ -290,13 +513,17 @@ function App() {
     settings.longBreak,
     settings.cycles,
     tickEnabled,
+    finalizeActiveSession,
+    restartSessionDraft,
   ])
 
   const updateDuration = (key: 'focus' | 'shortBreak' | 'longBreak', nextMinutes: number) => {
-    const seconds = clamp(Math.round(nextMinutes * 60), 60, 120 * 60)
+    const seconds = Math.max(60, Math.round(nextMinutes * 60))
     setSettings((prev) => ({ ...prev, [key]: seconds }))
-    if (!isRunning && mode === key) {
+
+    if (!isRunningRef.current && mode === key) {
       setSecondsLeft(seconds)
+      restartSessionDraft(mode, currentCycle, seconds)
     }
   }
 
@@ -307,32 +534,59 @@ function App() {
   }
 
   const toggleRun = () => {
-    if (!isRunning && tickEnabled) {
+    if (!isRunningRef.current && tickEnabled) {
       ensureAudio()
     }
     setIsRunning((prev) => !prev)
   }
 
   const resetTimer = () => {
+    const draft = activeSessionRef.current
+    const elapsed = Math.max(0, draft.plannedSeconds - secondsLeftRef.current)
+
+    if (elapsed > 0 || isRunningRef.current) {
+      finalizeActiveSession('reset', { forcedActualSeconds: elapsed })
+      restartSessionDraft(mode, currentCycle, baseDuration)
+    }
+
     setIsRunning(false)
     setSecondsLeft(baseDuration)
   }
 
   const resetAll = () => {
+    const draft = activeSessionRef.current
+    const elapsed = Math.max(0, draft.plannedSeconds - secondsLeftRef.current)
+
+    if (elapsed > 0 || isRunningRef.current) {
+      finalizeActiveSession('reset', { forcedActualSeconds: elapsed })
+    }
+
     setIsRunning(false)
     setSettings(DEFAULT_SETTINGS)
     setMode('focus')
     setCurrentCycle(1)
     setSecondsLeft(DEFAULT_SETTINGS.focus)
+    restartSessionDraft('focus', 1, DEFAULT_SETTINGS.focus)
   }
 
   const skipStage = () => {
-    const keepRunning = isRunning
+    const draft = activeSessionRef.current
+    const elapsed = Math.max(0, draft.plannedSeconds - secondsLeftRef.current)
+
+    if (elapsed > 0 || isRunningRef.current) {
+      finalizeActiveSession('skipped', {
+        forcedActualSeconds: elapsed,
+        markSkipped: true,
+      })
+    }
+
+    const keepRunning = isRunningRef.current
     const updated = nextStage()
     setMode(updated.mode)
     setCurrentCycle(updated.cycle)
     setSecondsLeft(updated.duration)
     setIsRunning(keepRunning)
+    restartSessionDraft(updated.mode, updated.cycle, updated.duration)
   }
 
   const progress = Math.min(1, Math.max(0, 1 - secondsLeft / baseDuration))
@@ -406,24 +660,24 @@ function App() {
               <SettingSlider
                 label="Focus"
                 minutes={Math.round(settings.focus / 60)}
-                min={15}
-                max={120}
+                min={1}
+                max={180}
                 disabled={isRunning}
                 onChange={(value) => updateDuration('focus', value)}
               />
               <SettingSlider
                 label="Short Break"
                 minutes={Math.round(settings.shortBreak / 60)}
-                min={3}
-                max={30}
+                min={1}
+                max={60}
                 disabled={isRunning}
                 onChange={(value) => updateDuration('shortBreak', value)}
               />
               <SettingSlider
                 label="Long Break"
                 minutes={Math.round(settings.longBreak / 60)}
-                min={10}
-                max={45}
+                min={1}
+                max={90}
                 disabled={isRunning}
                 onChange={(value) => updateDuration('longBreak', value)}
               />
@@ -457,18 +711,71 @@ function App() {
                 <span className="switch-visual" aria-hidden>
                   <span className="switch-thumb" />
                 </span>
-                <span className="switch-label">
-                  {tickEnabled ? 'Tick sound on' : 'Tick sound muted'}
-                </span>
+                <span className="switch-label">{tickEnabled ? 'Tick sound on' : 'Tick sound muted'}</span>
               </button>
             </div>
           </section>
         )}
 
         {activeTab === 'stats' && (
-          <section className="placeholder-panel tab-panel">
-            <p className="panel-title">Insights</p>
-            <p className="panel-subtitle">Session insights are on the way.</p>
+          <section className="settings-panel tab-panel analytics-panel">
+            <div className="panel-head">
+              <div>
+                <p className="panel-title">Insights</p>
+                <p className="panel-subtitle">Your finish discipline and momentum windows.</p>
+              </div>
+              <button className="text-link" onClick={() => void loadAnalyticsSummary()}>
+                Refresh
+              </button>
+            </div>
+
+            {analyticsLoading && !analyticsSummary && (
+              <p className="panel-subtitle analytics-state">Loading your insights...</p>
+            )}
+
+            {analyticsError && <p className="analytics-error">{analyticsError}</p>}
+
+            {analyticsSummary && selectedWindow && (
+              <>
+                <div className="finish-drive">
+                  <div>
+                    <p className="finish-drive-label">Finish Pressure Score</p>
+                    <p className="finish-drive-score">{selectedWindow.finishPressureScore}</p>
+                  </div>
+                  <div className="finish-drive-meter" aria-hidden>
+                    <span
+                      className="finish-drive-fill"
+                      style={{ width: `${selectedWindow.finishPressureScore}%` }}
+                    />
+                  </div>
+                  <p className="finish-drive-text">{buildPressureMessage(selectedWindow)}</p>
+                </div>
+
+                <div className="analytics-grid">
+                  {ANALYTICS_WINDOWS.map((windowDef) => {
+                    const item = analyticsSummary[windowDef.key]
+                    return (
+                      <article key={windowDef.key} className="analytics-card">
+                        <p className="analytics-card-label">{windowDef.label}</p>
+                        <p className="analytics-card-value">{formatPercent(item.completionRate)}</p>
+                        <p className="analytics-card-meta">
+                          {item.completedSessions} finished / {item.totalSessions} sessions
+                        </p>
+                        <p className="analytics-card-meta">
+                          Focus time {formatDuration(item.focusActualSeconds)}
+                        </p>
+                        <p className="analytics-card-meta">Streak {item.streakDays} days</p>
+                      </article>
+                    )
+                  })}
+                </div>
+
+                <p className="analytics-footnote">
+                  Unfinished load this week: {formatDuration(selectedWindow.unfinishedSeconds)}. Closing
+                  sessions consistently protects your pace.
+                </p>
+              </>
+            )}
           </section>
         )}
 
