@@ -42,6 +42,12 @@ const DEFAULT_SETTINGS: Settings = {
   cycles: 4,
 }
 
+const DURATION_LIMITS: Record<Mode, { min: number; max: number }> = {
+  focus: { min: 1, max: 150 },
+  shortBreak: { min: 1, max: 20 },
+  longBreak: { min: 1, max: 45 },
+}
+
 const LABELS: Record<Mode, string> = {
   focus: 'Focus',
   shortBreak: 'Short Break',
@@ -150,13 +156,25 @@ const buildPressureMessage = (summary: AnalyticsWindowSummary) => {
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
 
+const clampDurationSeconds = (mode: Mode, seconds: number) => {
+  const limits = DURATION_LIMITS[mode]
+  return clamp(Math.round(seconds), limits.min * 60, limits.max * 60)
+}
+
+const sanitizeSettings = (settings: Partial<Settings>): Settings => ({
+  focus: clampDurationSeconds('focus', settings.focus ?? DEFAULT_SETTINGS.focus),
+  shortBreak: clampDurationSeconds('shortBreak', settings.shortBreak ?? DEFAULT_SETTINGS.shortBreak),
+  longBreak: clampDurationSeconds('longBreak', settings.longBreak ?? DEFAULT_SETTINGS.longBreak),
+  cycles: clamp(Math.round(settings.cycles ?? DEFAULT_SETTINGS.cycles), 1, 12),
+})
+
 const loadSettings = (): Settings => {
   if (typeof window === 'undefined') return DEFAULT_SETTINGS
   const raw = localStorage.getItem('pomodrone-settings')
   if (!raw) return DEFAULT_SETTINGS
   try {
     const parsed = JSON.parse(raw) as Partial<Settings>
-    return { ...DEFAULT_SETTINGS, ...parsed }
+    return sanitizeSettings(parsed)
   } catch (error) {
     console.warn('Falling back to defaults', error)
     return DEFAULT_SETTINGS
@@ -199,9 +217,8 @@ const SettingSlider = ({
   disabled?: boolean
   onChange: (nextMinutes: number) => void
 }) => {
-  const safeMinutes = Math.max(min, Math.round(minutes))
-  const adaptiveMax = Math.max(max, safeMinutes + Math.max(step * 20, 12))
-  const fillPercent = ((safeMinutes - min) / (adaptiveMax - min || 1)) * 100
+  const safeMinutes = clamp(Math.round(minutes), min, max)
+  const fillPercent = ((safeMinutes - min) / (max - min || 1)) * 100
 
   return (
     <div className="setting-row">
@@ -214,13 +231,14 @@ const SettingSlider = ({
             <input
               type="number"
               min={min}
+              max={max}
               step={1}
               disabled={disabled}
               className="minute-input"
               value={safeMinutes}
               onChange={(event) => {
                 const next = Number(event.target.value)
-                onChange(Number.isFinite(next) ? Math.max(min, Math.round(next)) : min)
+                onChange(Number.isFinite(next) ? clamp(Math.round(next), min, max) : min)
               }}
             />
           </label>
@@ -229,12 +247,12 @@ const SettingSlider = ({
       <input
         type="range"
         min={min}
-        max={adaptiveMax}
+        max={max}
         step={step}
         value={safeMinutes}
         disabled={disabled}
         style={{ '--range-fill': `${fillPercent}%` } as CSSProperties}
-        onChange={(event) => onChange(Number(event.target.value))}
+        onChange={(event) => onChange(clamp(Number(event.target.value), min, max))}
       />
     </div>
   )
@@ -518,7 +536,9 @@ function App() {
   ])
 
   const updateDuration = (key: 'focus' | 'shortBreak' | 'longBreak', nextMinutes: number) => {
-    const seconds = Math.max(60, Math.round(nextMinutes * 60))
+    const limits = DURATION_LIMITS[key]
+    const boundedMinutes = clamp(Math.round(nextMinutes), limits.min, limits.max)
+    const seconds = boundedMinutes * 60
     setSettings((prev) => ({ ...prev, [key]: seconds }))
 
     if (!isRunningRef.current && mode === key) {
@@ -660,24 +680,24 @@ function App() {
               <SettingSlider
                 label="Focus"
                 minutes={Math.round(settings.focus / 60)}
-                min={1}
-                max={180}
+                min={DURATION_LIMITS.focus.min}
+                max={DURATION_LIMITS.focus.max}
                 disabled={isRunning}
                 onChange={(value) => updateDuration('focus', value)}
               />
               <SettingSlider
                 label="Short Break"
                 minutes={Math.round(settings.shortBreak / 60)}
-                min={1}
-                max={60}
+                min={DURATION_LIMITS.shortBreak.min}
+                max={DURATION_LIMITS.shortBreak.max}
                 disabled={isRunning}
                 onChange={(value) => updateDuration('shortBreak', value)}
               />
               <SettingSlider
                 label="Long Break"
                 minutes={Math.round(settings.longBreak / 60)}
-                min={1}
-                max={90}
+                min={DURATION_LIMITS.longBreak.min}
+                max={DURATION_LIMITS.longBreak.max}
                 disabled={isRunning}
                 onChange={(value) => updateDuration('longBreak', value)}
               />
