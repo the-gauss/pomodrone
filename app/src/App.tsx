@@ -26,6 +26,7 @@ type Settings = {
 
 type TabKey = 'timer' | 'session' | 'stats' | 'profile'
 type AnalyticsWindowKey = 'sevenDay' | 'thirtyDay' | 'allTime'
+type AccentTheme = 'neonGreen' | 'brightMagenta' | 'cyan'
 
 type ActiveSessionDraft = {
   sessionId: string
@@ -59,6 +60,17 @@ const ANALYTICS_WINDOWS: ReadonlyArray<{ key: AnalyticsWindowKey; label: string 
   { key: 'sevenDay', label: 'Last 7 days' },
   { key: 'thirtyDay', label: 'Last 30 days' },
   { key: 'allTime', label: 'All time' },
+]
+
+const ACCENT_OPTIONS: ReadonlyArray<{
+  key: AccentTheme
+  label: string
+  accent: string
+  accentRgb: string
+}> = [
+  { key: 'neonGreen', label: 'Neon Green', accent: '#8cff4d', accentRgb: '140, 255, 77' },
+  { key: 'brightMagenta', label: 'Bright Magenta', accent: '#ff2fb4', accentRgb: '255, 47, 180' },
+  { key: 'cyan', label: 'Cyan', accent: '#20f3ff', accentRgb: '32, 243, 255' },
 ]
 
 const TAB_ICONS: Record<TabKey, () => JSX.Element> = {
@@ -163,6 +175,12 @@ const loadSettings = (): Settings => {
   }
 }
 
+const loadAccentTheme = (): AccentTheme => {
+  if (typeof window === 'undefined') return 'neonGreen'
+  const raw = localStorage.getItem('pomodrone-accent-theme')
+  return ACCENT_OPTIONS.some((option) => option.key === raw) ? (raw as AccentTheme) : 'neonGreen'
+}
+
 const createSessionId = () => {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID()
@@ -255,6 +273,7 @@ function App() {
   const [analyticsSummary, setAnalyticsSummary] = useState<AnalyticsSummary | null>(null)
   const [analyticsLoading, setAnalyticsLoading] = useState(true)
   const [analyticsError, setAnalyticsError] = useState<string | null>(null)
+  const [accentTheme, setAccentTheme] = useState<AccentTheme>(() => loadAccentTheme())
 
   const audioCtxRef = useRef<AudioContext | null>(null)
   const secondsLeftRef = useRef(secondsLeft)
@@ -413,6 +432,20 @@ function App() {
       localStorage.setItem('pomodrone-tick', String(tickEnabled))
     }
   }, [tickEnabled])
+
+  useEffect(() => {
+    const selected = ACCENT_OPTIONS.find((option) => option.key === accentTheme) ?? ACCENT_OPTIONS[0]
+
+    if (typeof document !== 'undefined') {
+      const root = document.documentElement
+      root.style.setProperty('--accent', selected.accent)
+      root.style.setProperty('--accent-rgb', selected.accentRgb)
+    }
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('pomodrone-accent-theme', accentTheme)
+    }
+  }, [accentTheme])
 
   const ensureAudio = () => {
     if (!tickEnabled) return null
@@ -782,7 +815,32 @@ function App() {
         {activeTab === 'profile' && (
           <section className="placeholder-panel tab-panel">
             <p className="panel-title">Companion</p>
-            <p className="panel-subtitle">More tools will arrive in future builds.</p>
+            <p className="panel-subtitle">Tune visuals while more tools are in progress.</p>
+            <div className="accent-panel">
+              <p className="setting-label">Accent color</p>
+              <div className="accent-options">
+                {ACCENT_OPTIONS.map((option) => (
+                  <button
+                    key={option.key}
+                    type="button"
+                    className={`accent-option ${accentTheme === option.key ? 'active' : ''}`}
+                    onClick={() => setAccentTheme(option.key)}
+                  >
+                    <span
+                      className="accent-swatch"
+                      style={
+                        {
+                          '--swatch-color': option.accent,
+                          '--swatch-rgb': option.accentRgb,
+                        } as CSSProperties
+                      }
+                      aria-hidden
+                    />
+                    <span>{option.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
           </section>
         )}
       </div>
