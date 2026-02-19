@@ -188,9 +188,25 @@ const summarizeWindow = (records, dayWindow) => {
   const consistencyRate =
     dayWindow && dayWindow > 0 ? clampNumber(activeDays / dayWindow, 0, 1) : clampNumber(completionRate, 0, 1)
 
-  const finishPressureScore = Math.round(
-    clampNumber(completionRate * 0.45 + averageCompletion * 0.35 + consistencyRate * 0.2, 0, 1) * 100,
+  const deepFocusRate =
+    focusSessions.length === 0 ? 0 : clampNumber(deepFocusSessions / focusSessions.length, 0, 1)
+  const streakMomentum = 1 - Math.exp(-streakDays / 6)
+  const unfinishedRatio =
+    totalPlannedSeconds > 0 ? clampNumber(unfinishedSeconds / totalPlannedSeconds, 0, 1) : 0
+
+  const baseMomentum = clampNumber(
+    completionRate * 0.35 +
+      averageCompletion * 0.25 +
+      consistencyRate * 0.2 +
+      streakMomentum * 0.13 +
+      deepFocusRate * 0.07,
+    0,
+    1,
   )
+
+  const interruptionPenalty = Math.pow(unfinishedRatio, 0.7) * 0.32
+  const adjustedMomentum = clampNumber(baseMomentum - interruptionPenalty, 0, 1)
+  const finishPressureScore = toSaturatingScore(adjustedMomentum)
 
   return {
     windowDays: dayWindow,
@@ -307,6 +323,13 @@ const parseSafeNumber = (value) => {
 }
 
 const clampNumber = (value, min, max) => Math.min(Math.max(value, min), max)
+
+const toSaturatingScore = (normalizedValue) => {
+  const bounded = clampNumber(normalizedValue, 0, 1)
+  const curve = 4.5
+  const saturated = (1 - Math.exp(-curve * bounded)) / (1 - Math.exp(-curve))
+  return Math.round(clampNumber(saturated, 0, 1) * 100)
+}
 
 const toIso = (value) => {
   const parsed = Date.parse(value)
