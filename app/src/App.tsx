@@ -73,6 +73,7 @@ const ACCENT_OPTIONS: ReadonlyArray<{
   textRgb?: string
   alpha?: string
   beta?: string
+  fontFamily?: string
 }> = [
   { key: 'neonGreen', label: 'Neon Green', accent: '#8cff4d', accentRgb: '140, 255, 77' },
   { key: 'brightMagenta', label: 'Bright Magenta', accent: '#ff2fb4', accentRgb: '255, 47, 180' },
@@ -88,6 +89,7 @@ const ACCENT_OPTIONS: ReadonlyArray<{
     textRgb: '88, 110, 117',
     alpha: '1',
     beta: '0px',
+    fontFamily: "'Source Serif 4', Georgia, serif",
   },
 ]
 
@@ -464,6 +466,10 @@ function App() {
       root.style.setProperty('--text-rgb', selected.textRgb ?? '214, 221, 231')
       root.style.setProperty('--alpha', selected.alpha ?? '0.2')
       root.style.setProperty('--beta', selected.beta ?? '5px')
+      root.style.setProperty(
+        '--font-family',
+        selected.fontFamily ?? "'Ubuntu', 'SF Pro Display', 'Helvetica Neue', sans-serif",
+      )
     }
 
     if (typeof window !== 'undefined') {
