@@ -26,7 +26,7 @@ type Settings = {
 
 type TabKey = 'timer' | 'session' | 'stats' | 'profile'
 type AnalyticsWindowKey = 'sevenDay' | 'thirtyDay' | 'allTime'
-type AccentTheme = 'neonGreen' | 'brightMagenta' | 'cyan'
+type AccentTheme = 'neonGreen' | 'brightMagenta' | 'cyan' | 'solarizedLight'
 
 type ActiveSessionDraft = {
   sessionId: string
@@ -67,10 +67,28 @@ const ACCENT_OPTIONS: ReadonlyArray<{
   label: string
   accent: string
   accentRgb: string
+  bg?: string
+  bgRgb?: string
+  text?: string
+  textRgb?: string
+  alpha?: string
+  beta?: string
 }> = [
   { key: 'neonGreen', label: 'Neon Green', accent: '#8cff4d', accentRgb: '140, 255, 77' },
   { key: 'brightMagenta', label: 'Bright Magenta', accent: '#ff2fb4', accentRgb: '255, 47, 180' },
   { key: 'cyan', label: 'Cyan', accent: '#20f3ff', accentRgb: '32, 243, 255' },
+  {
+    key: 'solarizedLight',
+    label: 'Solarized Light',
+    accent: '#b58900',
+    accentRgb: '181, 137, 0',
+    bg: '#fdf6e3',
+    bgRgb: '253, 246, 227',
+    text: '#586e75',
+    textRgb: '88, 110, 117',
+    alpha: '1',
+    beta: '0px',
+  },
 ]
 
 const TAB_ICONS: Record<TabKey, () => JSX.Element> = {
@@ -440,6 +458,12 @@ function App() {
       const root = document.documentElement
       root.style.setProperty('--accent', selected.accent)
       root.style.setProperty('--accent-rgb', selected.accentRgb)
+      root.style.setProperty('--bg', selected.bg ?? '#0f1628')
+      root.style.setProperty('--bg-rgb', selected.bgRgb ?? '15, 22, 40')
+      root.style.setProperty('--text', selected.text ?? '#d6dde7')
+      root.style.setProperty('--text-rgb', selected.textRgb ?? '214, 221, 231')
+      root.style.setProperty('--alpha', selected.alpha ?? '0.2')
+      root.style.setProperty('--beta', selected.beta ?? '5px')
     }
 
     if (typeof window !== 'undefined') {
