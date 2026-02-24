@@ -80,7 +80,7 @@ const ACCENT_OPTIONS: ReadonlyArray<{
   { key: 'cyan', label: 'Cyan', accent: '#20f3ff', accentRgb: '32, 243, 255' },
   {
     key: 'solarizedLight',
-    label: 'Solarized Light',
+    label: 'Product Light\u2122',
     accent: '#b58900',
     accentRgb: '181, 137, 0',
     bg: '#fdf6e3',
